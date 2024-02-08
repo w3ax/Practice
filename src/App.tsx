@@ -1,19 +1,48 @@
+import { ChangeEvent, useState } from 'react';
+import sun from '/sun.png';
+import { Image, Select, Box, Text } from '@chakra-ui/react';
+import './App.css';
 
-import sun from '/sunn.gif'
-import './App.css'
+const App = () => {
+    const [selectedOption, setSelectedOption] = useState('');
 
-function App() {
+    const handleSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
+        setSelectedOption(event.target.value);
+    };
 
-  return (
-      <>
-          <div>
-              <img src={sun} className="sun-pic" alt="Sun "/>
-          </div>
-          <h1>Weather forecast</h1>
-          <div className="card">
-          </div>
-      </>
-  )
-}
+    return (
+        <Box
+            className="app-container"
+            minH="100vh"
+            bgGradient="linear(to right, rgba(159,212,151,1) 0%, rgba(247,249,255,1) 50%, rgba(126,188,200,1) 100%)"
+            animation="gradient 30s infinite linear"
+            bgSize="700% 700%"
+        >
+            <Box className="sun-container">
+                <Image
+                    className="sun-pic"
+                    src={sun}
+                    alt="sun"
+                />
+            </Box>
+            <Box className="content-container">
+                <Text className="header-text">Weather forecast</Text>
+                <Select
+                    className="select-city"
+                    variant='filled'
+                    value={selectedOption}
+                    onChange={handleSelectChange}
+                    w="350px"
+                    h="60px"
+                >
+                    <option value='' disabled hidden>Select a city</option>
+                    <option value='city1'>Kyiv</option>
+                    <option value='city2'>Lviv</option>
+                    <option value='city3'>Khmelnytskiy</option>
+                </Select>
+            </Box>
+        </Box>
+    );
+};
 
-export default App
+export default App;

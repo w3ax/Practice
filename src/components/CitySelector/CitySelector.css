@@ -1,0 +1,10 @@
+.city-selector-container {
+    position: relative;
+    width: 350px;
+    margin-bottom: 100px;
+    font-family: 'Montserrat', sans-serif;
+
+    input {
+        height: 45px;
+    }
+}

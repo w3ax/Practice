@@ -1,0 +1,45 @@
+.bottom-panel {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 60px;
+    position: fixed;
+    bottom: 20px;
+    width: 70%;
+    height: 18%;
+    border-radius: 30px;
+    text-align: center;
+}
+
+
+.panel-section {
+    text-align: center;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.temp {
+    font-size: 28px;
+    font-weight: bold;
+    font-family: 'Lato', sans-serif;
+    margin: -10px auto auto;
+}
+
+.city-name {
+    font-size: 18px;
+    font-family: 'Montserrat', sans-serif;
+    margin: auto;
+}
+
+.weather-panel-pic {
+    width: 90px;
+    height: 90px;
+    object-fit: cover;
+    margin-top: -10px;
+}

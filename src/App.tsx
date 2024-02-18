@@ -1,116 +1,85 @@
-import { ChangeEvent, useRef, useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import sun from '/sun.png';
-import sunny from '/sunny.svg';
-import rainy from '/rainy.svg';
-import cloudy from '/cloudy.svg';
 import { Image, Box, Text } from '@chakra-ui/react';
 import './App.css';
+import CitySelector from './components/CitySelector/CitySelector.tsx';
+import { weatherApiUrl, weatherApiKey } from "./API";
+import WeatherBottomPanel from './components/WeatherBottomPanel/WeatherBottomPanel.tsx';
+import CityWeather from "./components/CityWeather/CityWeather.tsx";
+import CityWeatherData from "./types/CityWeatherData.tsx";
 
 const App = () => {
-    const WeatherPanel = () => {
-        const [weatherData] = useState([
-            { city: 'Paris', temperature: 9, weatherCondition: 'rainy', imageAlt: 'Опис картинки Парижа' },
-            { city: 'New York', temperature: 15, weatherCondition: 'sunny', imageAlt: 'Опис картинки Нью-Йорка' },
-            { city: 'London', temperature: 12, weatherCondition: 'cloudy', imageAlt: 'Опис картинки Лондона' },
-            { city: 'Berlin', temperature: 10, weatherCondition: 'rainy', imageAlt: 'Опис картинки Берліна' },
-            { city: 'Prague', temperature: 14, weatherCondition: 'cloudy', imageAlt: 'Опис картинки Праги' },
-            { city: 'Tokyo', temperature: 20, weatherCondition: 'sunny', imageAlt: 'Опис картинки Токіо' },
-            { city: 'Beijing', temperature: 16, weatherCondition: 'rainy', imageAlt: 'Опис картинки Пекіна' },
-            { city: 'Kyiv', temperature: 8, weatherCondition: 'cloudy', imageAlt: 'Опис картинки Києва' },
-        ]);
+    const [cityWeather, setCityWeather] = useState<CityWeatherData>({
+        id: 0,
+        temperature: 0,
+        city: '',
+        weatherCondition: '',
+        imageAlt: '',
+        weather: [],
+        main: {
+            temp: 0,
+            feels_like: 0,
+            humidity: 0,
+            pressure: 0,
+        },
+        wind: {
+            speed: 0,
+        },
+    });
+    const [weatherData, setWeatherData] = useState<CityWeatherData[]>([
+        { city: 'Paris', id: 2988507 },
+        { city: 'New York', id: 5128581 },
+        { city: 'London', id: 2643743 },
+        { city: 'Berlin', id: 2950159 },
+        { city: 'Prague', id: 3067696 },
+        { city: 'Tokyo', id: 1850147 },
+        { city: 'Beijing', id: 1816670 },
+        { city: 'Kyiv', id: 703448 },
+    ]);
 
-        return (
-            <Box className="bottom-panel">
-                {weatherData.map((item, index) => (
-                    <Box key={index} className="panel-section">
-                        <Image className="weather-panel-pic" src={getWeatherImage(item.weatherCondition)} alt={item.imageAlt} mb={2} />
-                        <Text className="temperature">{`${item.temperature}°C`}</Text>
-                        <Text className="city-name">{item.city}</Text>
-                    </Box>
-                ))}
-            </Box>
+    useEffect(() => {
+        const fetchWeatherData = async () => {
+            const dataPromise = weatherData.map(async (item) => {
+                const response = await fetch(
+                    `${weatherApiUrl}/weather?id=${item.id}&appid=${weatherApiKey}&units=metric`
+                );
+                const weatherResponse = await response.json();
+                return {
+                    city: item.city,
+                    temperature: weatherResponse.main.temp,
+                    weatherCondition: weatherResponse.weather[0].main,
+                    imageAlt: `${item.city} weather`,
+                };
+            });
+            const newData = await Promise.all(dataPromise);
+            setWeatherData(newData.map(item => ({
+                ...item,
+                id: Math.random(),
+            })));
+        };
+        fetchWeatherData();
+    }, [weatherData]);
+
+    const handleSearchChange = (searchData: any) => {
+        const [lat, lon] = searchData.value.split(" ");
+        const cityWeatherFetch = fetch(
+            `${weatherApiUrl}/weather?lat=${lat}&lon=${lon}&appid=${weatherApiKey}&units=metric`
         );
-    };
-
-    const getWeatherImage = (weatherCondition: string) => {
-        switch (weatherCondition) {
-            case 'sunny':
-                return sunny;
-            case 'rainy':
-                return rainy;
-            case 'cloudy':
-                return cloudy;
-            default:
-                return sunny;
-        }
-    };
-
-    const CitySelector = () => {
-        const cityList = [
-            'Kyiv', 'Lviv', 'Khmelnytskiy', 'New York', 'Paris', 'London', 'Berlin', 'Prague', 'Tokyo', 'Beijing'
-        ];
-
-        const [filter, setFilter] = useState('');
-        const [selectedCity, setSelectedCity] = useState('');
-        const [isOpen, setIsOpen] = useState(false);
-        const menuRef = useRef<HTMLDivElement>(null);
-
-        const handleToggleMenu = () => {
-            setIsOpen(!isOpen);
-        };
-
-        const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-            const value = event.target.value;
-            setFilter(value);
-            setSelectedCity(value);
-            setIsOpen(true);
-        };
-
-        const handleSelect = (city: string) => {
-            setSelectedCity(city);
-            setFilter('');
-            setIsOpen(false);
-        };
-
-        const handleDocumentClick = (e: MouseEvent) => {
-            if (isOpen && menuRef.current && !menuRef.current.contains(e.target as Node)) {
-                setIsOpen(false);
-            }
-        };
-
-        useEffect(() => {
-            document.addEventListener("mousedown", handleDocumentClick);
-
-            return () => {
-                document.removeEventListener("mousedown", handleDocumentClick);
-            };
-        }, [isOpen]);
-
-        const filteredCities = cityList.filter(city =>
-            city.toLowerCase().includes(filter.toLowerCase())
-        );
-
-        return (
-            <div className="city-selector-container" ref={menuRef}>
-                <input
-                    type="text"
-                    placeholder="Type or select"
-                    value={selectedCity || filter}
-                    onChange={handleChange}
-                    onFocus={handleToggleMenu}
-                    onClick={(e) => e.stopPropagation()}
-                />
-                {isOpen && (
-                    <ul className="city-selector-list">
-                        {filteredCities.map(city => (
-                            <li key={city} onClick={() => handleSelect(city)}>
-                                {city}
-                            </li>
-                        ))}
-                    </ul>
-                )}
-            </div>
-        );
+        Promise.all([cityWeatherFetch])
+            .then(async (responses) => {
+                const weatherResponse = await responses[0].json();
+                setCityWeather({
+                    id: Math.random(),
+                    city: searchData.label,
+                    imageAlt: `${searchData.label} weather`,
+                    temperature: weatherResponse.main.temp,
+                    weatherCondition: weatherResponse.weather[0].main,
+                    weather: weatherResponse.weather,
+                    main: weatherResponse.main,
+                    wind: weatherResponse.wind,
+                });
+            })
+            .catch(console.log);
     };
 
     return (
@@ -122,17 +91,14 @@ const App = () => {
             bgSize="700% 700%"
         >
             <Box className="sun-container">
-                <Image
-                    className="sun-pic"
-                    src={sun}
-                    alt="sun"
-                />
+                <Image className="sun-pic" src={sun} alt="sun" />
             </Box>
             <Box className="content-container">
                 <Text className="header-text">Weather forecast</Text>
-                <CitySelector />
+                <CitySelector onSearchChange={handleSearchChange} />
+                {cityWeather && <CityWeather data={cityWeather} />}
             </Box>
-            <WeatherPanel/>
+            <WeatherBottomPanel weatherData={weatherData} />
         </Box>
     );
 };

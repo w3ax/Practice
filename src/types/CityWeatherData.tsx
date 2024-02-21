@@ -7,6 +7,7 @@ interface CityWeatherData {
     weather?: {
         description: string;
         icon: string;
+        main: string;
     }[];
     main?: {
         temp: number;

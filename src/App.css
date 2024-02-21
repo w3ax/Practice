@@ -4,6 +4,10 @@
     justify-content: center;
     align-items: center;
     height: 100vh;
+    min-height: 100vh;
+    background: linear-gradient(to right, rgba(159,212,151,100) 0%, rgba(255,238,208,0.8) 50%, rgba(126,188,200,100) 100%);
+    animation: gradient 70s infinite linear;
+    background-size: 700% 700%;
 }
 
 .sun-container {

@@ -1,4 +1,4 @@
-import React, { useState, ReactElement } from "react";
+import React, { useState, ReactElement, useEffect } from "react";
 import { AsyncPaginate } from "react-select-async-paginate";
 import { cityApiOptions, cityApiUrl } from "../../API.ts";
 import "./CitySelector.css";
@@ -17,14 +17,16 @@ interface Option {
 
 interface CitySelectorProps {
     onSearchChange: (searchData: Option | null) => void;
+    className?: string;
 }
 
 const CitySelector: React.FC<CitySelectorProps> = ({ onSearchChange }): ReactElement => {
     const [search, setSearch] = useState<Option | null>(null);
+    const [moveUp, setMoveUp] = useState(false);
 
     const loadOptions = async (inputValue: string): Promise<{ options: Option[] }> => {
         const response = await fetch(
-            `${cityApiUrl}/cities?minPopulation=100000&limit=6&namePrefix=${inputValue}`,
+            `${cityApiUrl}/cities?minPopulation=250000&limit=6&namePrefix=${inputValue}&types=CITY`,
             cityApiOptions
         );
         const response_1 = await response.json();
@@ -50,11 +52,21 @@ const CitySelector: React.FC<CitySelectorProps> = ({ onSearchChange }): ReactEle
     const handleOnChange = (searchData: Option | null): void => {
         setSearch(searchData);
         onSearchChange(searchData);
+        setMoveUp(true);
     };
+
+    useEffect(() => {
+        if (moveUp) {
+            const citySelectorContainer = document.querySelector('.city-selector-container');
+            if (citySelectorContainer) {
+                citySelectorContainer.classList.add('move-up');
+            }
+        }
+    }, [moveUp]);
 
     return (
         <AsyncPaginate
-            className="city-selector-container"
+            className={`city-selector-container ${moveUp ? 'move-up' : ''}`}
             placeholder="Search"
             debounceTimeout={500}
             value={search}

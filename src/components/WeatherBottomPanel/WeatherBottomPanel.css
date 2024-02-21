@@ -4,11 +4,11 @@
     justify-content: space-between;
     align-items: center;
     background: white;
-    padding: 60px;
+    padding: 40px;
     position: fixed;
     bottom: 20px;
-    width: 70%;
-    height: 18%;
+    width: 67.1vw;
+    height: 25%;
     border-radius: 30px;
     text-align: center;
 }
@@ -20,8 +20,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 10px;
-    margin-bottom: 10px;
+    margin-top: -2vh;
 }
 
 .temp {
